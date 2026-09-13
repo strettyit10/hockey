@@ -99,10 +99,13 @@ body{
 .basepip{display:inline-block; padding:0 4px; border-radius:2px; font-weight:600;
   background:var(--sunk); color:var(--ink-2)}
 @media (max-width:940px){
-  .rail{position:static; flex-direction:row; overflow-x:auto; gap:8px; padding-bottom:6px;
-    scrollbar-width:thin}
-  .rail .eyebrow{display:none}
-  .setbtn{min-width:172px; flex:0 0 auto}
+  .rail{position:static; display:grid; gap:7px;
+    grid-template-columns:repeat(auto-fit,minmax(158px,1fr))}
+  .rail .eyebrow{grid-column:1/-1; padding-bottom:0}
+  .setbtn{grid-template-columns:20px 1fr; gap:8px; padding:7px 9px}
+  .setbtn .no{font-size:18px}
+  .setbtn .dt{font-size:15px}
+  .setbtn .sub{font-size:10px; gap:5px}
 }
 
 /* ---------- panel ---------- */
@@ -135,7 +138,7 @@ body{
 .haul .btn[aria-pressed="true"]{background:var(--redline); color:var(--surface)}
 .haul .tie{font-size:13.5px; color:var(--ink-2); margin-top:8px}
 .opts{margin:9px 0 0; padding:0; list-style:none; display:grid; gap:6px;
-  grid-template-columns:repeat(auto-fill,minmax(320px,1fr));
+  grid-template-columns:repeat(auto-fill,minmax(min(320px,100%),1fr));
   max-height:270px; overflow-y:auto; scrollbar-width:thin}
 .opt{border:1px solid var(--hair); border-left:3px solid var(--redline); border-radius:2px;
   background:var(--surface); padding:7px 10px; cursor:pointer; transition:box-shadow .12s}
@@ -196,13 +199,29 @@ svg.map{display:block; width:100%; height:auto; max-width:100%}
   padding:3px 7px; border-radius:2px; pointer-events:none}
 
 /* ---------- clusters ---------- */
-.clusters{padding:16px; display:grid; gap:12px;
-  grid-template-columns:repeat(auto-fill,minmax(330px,1fr))}
+.dethead{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px;
+  padding:14px 16px 0}
+.dethead h3{font-family:"Barlow Condensed",sans-serif; font-weight:700; text-transform:uppercase;
+  font-size:19px; letter-spacing:.03em; margin:0; line-height:1}
+.dethead .sub{font-size:12.5px; color:var(--muted)}
+.dethead .all{margin-left:auto; display:flex; gap:6px}
+.dethead .all button{font:inherit; font-size:12px; cursor:pointer; padding:2px 9px; border-radius:2px;
+  border:1px solid var(--hair); background:var(--surface); color:var(--ink-2)}
+.dethead .all button:hover{border-color:var(--blueline); color:var(--blueline)}
+.clusters{padding:10px 16px 16px; display:grid; gap:8px; align-content:start;
+  grid-template-columns:repeat(auto-fill,minmax(min(330px,100%),1fr))}
 .cl{border:1px solid var(--hair); border-radius:3px; overflow:hidden; background:var(--surface);
-  cursor:pointer; transition:box-shadow .12s, border-color .12s}
+  transition:box-shadow .12s, border-color .12s; align-self:start}
 .cl:hover{box-shadow:var(--shadow)}
 .cl.on{border-color:currentColor; box-shadow:var(--shadow)}
-.clhead{display:flex; align-items:center; gap:9px; padding:8px 11px; border-bottom:1px solid var(--hair-2)}
+.cl[open]{border-color:currentColor}
+.clhead{display:flex; align-items:center; gap:9px; padding:8px 11px; cursor:pointer;
+  list-style:none; user-select:none}
+.clhead::-webkit-details-marker{display:none}
+.cl[open] .clhead{border-bottom:1px solid var(--hair-2)}
+.chev{flex:0 0 auto; width:11px; height:11px; margin-left:2px; color:var(--muted);
+  transition:transform .15s}
+.cl[open] .chev{transform:rotate(90deg); color:currentColor}
 .clbadge{width:22px; height:22px; border-radius:2px; display:grid; place-items:center; color:#fff;
   font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:14px; flex:0 0 auto}
 .clhead .ttl{font-family:"Barlow Condensed",sans-serif; font-weight:600; text-transform:uppercase;
@@ -239,6 +258,38 @@ svg.map{display:block; width:100%; height:auto; max-width:100%}
 
 footer{margin-top:22px; padding-top:12px; border-top:1px solid var(--hair);
   color:var(--muted); font-size:12.5px; display:flex; flex-wrap:wrap; gap:4px 20px}
+@media (max-width:640px){
+  .wrap{padding-inline:12px; padding-block:16px 40px}
+  .mast{gap:8px 16px; padding-bottom:10px; margin-bottom:14px}
+  .mast p{font-size:13.5px; line-height:1.45}
+  .mast h1{font-size:clamp(26px,8vw,34px)}
+  .tally{margin-left:0; gap:16px}
+  .tally div{text-align:left}
+  .phead{padding:12px}
+  .phead h2{font-size:21px}
+  .facts{margin-left:0}
+  .notes, .filters, .haul, .clusters, .dethead{padding-left:12px; padding-right:12px}
+  .notes{gap:4px 16px; font-size:12.5px}
+  .haul .btn{margin-left:0}
+  .haul .why{font-size:12px}
+  .opts{max-height:none}
+  .dethead .all{margin-left:0; width:100%}
+  .dethead .all button{flex:1}
+  /* SVG text is in user units, so it needs its own bump to stay legible */
+  .lbl{font-size:21px; stroke-width:6px}
+  .baselbl{font-size:26px; stroke-width:7px}
+  .maplegend{position:static; background:none; padding:8px 12px 10px; text-align:center;
+    line-height:1.5}
+  .mapbox{padding-bottom:0}
+  .gm{grid-template-columns:1fr auto; gap:2px 8px}
+  .gm .d{grid-column:1/-1}
+  .arena .dist{margin-left:0; width:100%}
+  .clhead .meta{font-size:10px}
+  /* comfortable tap targets */
+  .chip, .haul .btn, .dethead .all button{min-height:32px; padding-block:5px}
+  .clhead{padding-block:11px}
+  .setbtn{min-height:44px}
+}
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 :focus-visible{outline:2px solid var(--blueline); outline-offset:2px}
 </style>
@@ -275,6 +326,14 @@ footer{margin-top:22px; padding-top:12px; border-top:1px solid var(--hair);
              aria-label="Map of matching rinks for the selected travel set"></svg>
         <div class="maplegend" id="legend">dashed ring = rinks in a max-games group &nbsp;·&nbsp; clusters numbered nearest&nbsp;&rarr;&nbsp;farthest &nbsp;·&nbsp; dot size = games</div>
       </div>
+      <div class="dethead" id="detHead" hidden>
+        <h3>Additional Details</h3>
+        <span class="sub" id="detSub"></span>
+        <span class="all">
+          <button type="button" id="expandAll">Expand all</button>
+          <button type="button" id="collapseAll">Collapse all</button>
+        </span>
+      </div>
       <div class="clusters" id="clusters"></div>
     </main>
   </div>
@@ -307,6 +366,7 @@ const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':
 let setIdx = DATA.sets.reduce((b, s, i) => s.nGames > DATA.sets[b].nGames ? i : b, 0);
 let bestOnly = false;
 let optIdx = null;
+let openCl = null;      // Set of expanded cluster ids; null = not yet initialised
 let active = new Set(CATS.map(c => c[0]));
 let focus = null;                       // focused cluster id
 
@@ -341,7 +401,7 @@ DATA.sets.forEach((s, i) => {
     `<span class="sub"><span class="basepip">${esc(s.start)}</span>` +
     `<span>${s.nGames} games</span><span>max ${s.best.games}</span>` +
     `</span></span>`;
-  b.addEventListener('click', () => { setIdx = i; focus = null; optIdx = null; bestOnly = false; render(); });
+  b.addEventListener('click', () => { setIdx = i; focus = null; optIdx = null; bestOnly = false; openCl = null; render(); });
   rail.appendChild(b);
 });
 
@@ -449,10 +509,15 @@ function render() {
   drawClusters(s, cls);
 }
 
+const NARROW = window.matchMedia('(max-width: 640px)');
+NARROW.addEventListener('change', () => render());
+
 function drawMap(s, cls) {
   const opt = (s.best.options || [])[optIdx];
   const best = new Set(opt ? opt.keys : s.best.keys);
-  const showAll = cls.reduce((n, c) => n + c.arenas.length, 0) <= 12;
+  // On a phone the map is ~360px wide, so a full set of city labels turns to
+  // mush — label only what the reader has singled out.
+  const showAll = !NARROW.matches && cls.reduce((n, c) => n + c.arenas.length, 0) <= 12;
 
   gBlob.innerHTML = bestOnly ? '' : cls.map((c, i) => {
     const col = cvar(i);
@@ -483,7 +548,7 @@ function drawMap(s, cls) {
         cx="${a.x}" cy="${a.y}" r="${(r + 4.5).toFixed(1)}"></circle>`);
       dots.push(`<circle class="dot${on ? ' on' : ''}" data-cl="${c.id}" cx="${a.x}" cy="${a.y}"
         r="${r.toFixed(1)}" fill="${col}"><title>${esc(a.city + ', ' + a.state)} — ${a.games.length} game${a.games.length > 1 ? 's' : ''}, ${a.mi} mi from ${s.start}</title></circle>`);
-      if (showAll || on || bestOnly || inBest) {
+      if (showAll || on || (bestOnly && !NARROW.matches) || (inBest && !NARROW.matches)) {
         const right = a.x < 700;
         lbls.push(`<text class="lbl${on ? ' on' : ''}" x="${(a.x + (right ? r + 4 : -r - 4)).toFixed(1)}"
           y="${(a.y + 3.4).toFixed(1)}" text-anchor="${right ? 'start' : 'end'}">${esc(a.city)}</text>`);
@@ -498,7 +563,8 @@ function drawMap(s, cls) {
     el.addEventListener('click', () => {
       const id = Number(el.dataset.cl);
       focus = focus === id ? null : id;
-      render();
+      if (openCl) { focus === null ? openCl.delete(id) : openCl.add(id); }
+      redraw();
       if (focus !== null) {
         const card = document.querySelector(`.cl[data-cl="${focus}"]`);
         card && card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
@@ -509,12 +575,19 @@ function drawMap(s, cls) {
 
 function drawClusters(s, cls) {
   const host = document.getElementById('clusters');
+  const dh = document.getElementById('detHead');
   if (!cls.length) {
+    dh.hidden = true;
     host.innerHTML = `<div class="empty-note" style="grid-column:1/-1"><b>Nothing on the board</b>` +
       (s.nGames ? 'No games in this trip match the categories you have switched on.'
                 : 'No games are scheduled inside this availability window.') + `</div>`;
     return;
   }
+  if (openCl === null) openCl = new Set([cls[0].id]);   // first group open at rest
+  dh.hidden = false;
+  document.getElementById('detSub').textContent =
+    `${cls.length} cluster${cls.length === 1 ? '' : 's'} · every game in this trip`;
+
   host.innerHTML = cls.map((c, i) => {
     const col = cvar(i);
     const nearest = c.arenas[0];
@@ -539,23 +612,43 @@ function drawClusters(s, cls) {
             <span class="t">${esc(g.time)}</span>
           </div>`).join('')}
       </div>`).join('');
-    return `<section class="cl${focus === c.id ? ' on' : ''}" data-cl="${c.id}"
-      style="color:${col}" tabindex="0" role="button" aria-pressed="${focus === c.id}">
-      <div class="clhead">
+    return `<details class="cl${focus === c.id ? ' on' : ''}" data-cl="${c.id}"
+      style="color:${col}"${openCl.has(c.id) ? ' open' : ''}>
+      <summary class="clhead">
         <span class="clbadge" style="background:${col}">${c.id}</span>
+        <svg class="chev" viewBox="0 0 10 10" aria-hidden="true"><path d="M3 1l4 4-4 4"
+          fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"
+          stroke-linejoin="round"></path></svg>
         <span class="ttl">${esc(title)}</span>
         <span class="meta">${meta}</span>
-      </div>${body}</section>`;
+      </summary>${body}</details>`;
   }).join('');
 
   host.querySelectorAll('.cl').forEach(el => {
-    const act = () => { const id = Number(el.dataset.cl); focus = focus === id ? null : id; render(); };
-    el.addEventListener('click', act);
-    el.addEventListener('keydown', e => {
-      if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); act(); }
+    el.addEventListener('toggle', () => {
+      const id = Number(el.dataset.cl);
+      // A freshly written <details open> can emit a toggle it never asked for;
+      // only act when the element disagrees with the state we rendered.
+      if (el.open === openCl.has(id)) return;
+      if (el.open) { openCl.add(id); focus = id; }
+      else {
+        openCl.delete(id);
+        if (focus === id) focus = null;
+      }
+      redraw();
     });
   });
+
+  const ids = cls.map(c => c.id);
+  document.getElementById('expandAll').onclick = () => {
+    ids.forEach(i => openCl.add(i)); redraw();
+  };
+  document.getElementById('collapseAll').onclick = () => {
+    openCl.clear(); focus = null; redraw();
+  };
 }
+
+function redraw() { render(); }
 
 function tagClass(cat) {
   return cat.includes('Showcase') ? 't-sh' : cat.startsWith('Local') ? 't-ln' : 't-nn';
