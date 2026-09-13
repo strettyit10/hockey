@@ -109,19 +109,6 @@ section > p:last-child{margin-bottom:0}
 .day.none{background:var(--none-wash)}
 .day.none .st{color:var(--ink-2)}
 
-/* ---------- month bars ---------- */
-.months{margin:0; padding:0; list-style:none; display:grid; gap:18px}
-.month .mh{display:flex; align-items:baseline; gap:10px; margin-bottom:7px}
-.month .mh b{font-size:19px}
-.month .mh span{font-size:16px; color:var(--ink-2)}
-.bar{display:flex; gap:2px; height:38px; border-radius:5px; overflow:hidden}
-.seg{display:grid; place-items:center; color:#fff; font-weight:700; font-size:16px;
-  min-width:2px; font-variant-numeric:tabular-nums}
-.seg.s-drive{background:var(--drive)} .seg.s-travel{background:var(--travel)}
-.seg.s-none{background:var(--none)}
-.axis{display:flex; justify-content:space-between; font-size:14px; color:var(--muted);
-  margin-top:6px}
-
 /* ---------- table ---------- */
 .tw{overflow-x:auto; border:1px solid var(--rule); border-radius:6px; background:var(--card)}
 table{border-collapse:collapse; width:100%; font-size:17px}
@@ -133,10 +120,7 @@ tbody tr:last-child td{border-bottom:0}
 td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
 td.teams{color:var(--ink-2)}
 
-/* ---------- callout + notes ---------- */
-.note{background:var(--card); border:1px solid var(--rule); border-left:6px solid var(--drive);
-  border-radius:6px; padding:18px 20px; box-shadow:var(--shadow)}
-.note p:last-child{margin-bottom:0}
+/* ---------- notes ---------- */
 .method{font-size:16px; color:var(--ink-2); border-top:1px solid var(--rule);
   padding-top:18px; margin-top:44px}
 .method p{max-width:70ch}
@@ -149,7 +133,6 @@ ul.plain li{margin-bottom:7px; max-width:64ch}
   body{font-size:17px}
   .page{padding-inline:16px; padding-block:26px 48px}
   .tile b{font-size:38px}
-  .bar{height:34px}
 }
 @media (prefers-reduced-motion:reduce){*{transition:none !important}}
 </style>
@@ -191,9 +174,17 @@ ul.plain li{margin-bottom:7px; max-width:64ch}
 </section>
 
 <section>
-  <h2>Month by month</h2>
-  <p>The same twenty-five days, grouped by month. Each bar is one day wide per day offered.</p>
-  <ul class="months" id="months"></ul>
+  <h2>Overview</h2>
+  <div class="tw">
+    <table>
+      <caption>Each trip, the games on the schedule, and the most that could be worked.</caption>
+      <thead>
+        <tr><th scope="col">Trip</th><th scope="col">Dates</th><th scope="col">Start from</th>
+            <th scope="col">Games scheduled</th><th scope="col">Most workable</th></tr>
+      </thead>
+      <tbody id="tripRows"></tbody>
+    </table>
+  </div>
 </section>
 
 <section>
@@ -208,27 +199,6 @@ ul.plain li{margin-bottom:7px; max-width:64ch}
             <th scope="col">Games</th><th scope="col">Home teams</th></tr>
       </thead>
       <tbody id="driveRows"></tbody>
-    </table>
-  </div>
-</section>
-
-<section>
-  <h2>What the schedule allowed</h2>
-  <div class="note">
-    <p>The twenty-five days form <strong>seven trips</strong> — runs of days that sit next
-       to each other on the calendar. Every one of the seven had games available.</p>
-    <p>Counting <strong>one game per day</strong>, and two on a day that offered two or more
-       showcase games, the schedule allowed up to <strong id="tMax">0</strong> games to be
-       worked across the three months.</p>
-  </div>
-  <div class="tw" style="margin-top:16px">
-    <table>
-      <caption>Each trip, the games on the schedule, and the most that could be worked.</caption>
-      <thead>
-        <tr><th scope="col">Trip</th><th scope="col">Dates</th><th scope="col">Start from</th>
-            <th scope="col">Games scheduled</th><th scope="col">Most workable</th></tr>
-      </thead>
-      <tbody id="tripRows"></tbody>
     </table>
   </div>
 </section>
@@ -263,7 +233,6 @@ const WORD = {
 };
 
 document.getElementById('tGames').textContent = D.tot.games;
-document.getElementById('tMax').textContent = D.tot.maxTotal;
 
 document.getElementById('days').innerHTML = D.days.map(d => {
   const [k, mark] = KEY[d.status];
@@ -273,21 +242,6 @@ document.getElementById('days').innerHTML = D.days.map(d => {
     <div class="wd">${esc(d.wd)}</div>
     <div class="st"><span class="key ${k}" aria-hidden="true">${mark}</span>
       <span>${esc(WORD[d.status](n))}</span></div>
-  </li>`;
-}).join('');
-
-document.getElementById('months').innerHTML = D.months.map(m => {
-  const drive = m.drive, travel = m.withg - m.drive, none = m.days - m.withg;
-  const seg = (cls, v, label) => v ? `<div class="seg s-${cls}" style="flex:${v}"
-      title="${v} ${label}">${v}</div>` : '';
-  return `<li class="month">
-    <div class="mh"><b>${esc(m.month)}</b><span>${m.days} days submitted</span></div>
-    <div class="bar">
-      ${seg('drive', drive, 'days with a drivable game')}
-      ${seg('travel', travel, 'days with a game, travel required')}
-      ${seg('none', none, 'days with no game scheduled')}
-    </div>
-    <div class="axis"><span>0 days</span><span>${m.days} days</span></div>
   </li>`;
 }).join('');
 
