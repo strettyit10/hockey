@@ -54,15 +54,19 @@ body{
 .wrap{max-width:1440px; margin:0 auto; padding-inline:18px; padding-block:22px 56px}
 
 /* ---------- masthead ---------- */
-.mast{display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 24px; padding-bottom:14px;
+.mast{display:flex; flex-wrap:wrap; align-items:flex-end; gap:14px 28px; padding-bottom:14px;
   border-bottom:2px solid var(--ink); margin-bottom:20px}
+.lede{flex:1 1 420px; min-width:0}
 .mast h1{
   font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:clamp(30px,4.6vw,46px);
   line-height:.95; letter-spacing:.005em; margin:0; text-transform:uppercase; text-wrap:balance;
 }
 .mast h1 em{font-style:normal; color:var(--blueline)}
-.mast p{margin:0; color:var(--ink-2); max-width:56ch; font-size:14.5px}
-.tally{margin-left:auto; display:flex; gap:20px; font-family:"IBM Plex Mono",ui-monospace,monospace}
+.mast p{margin:6px 0 0; color:var(--ink-2); font-size:14.5px; line-height:1.5}
+.mast p b{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:13px;
+  letter-spacing:.1em; text-transform:uppercase; color:var(--blueline); margin-right:3px}
+.tally{margin-left:auto; flex:0 0 auto; display:flex; gap:22px;
+  font-family:"IBM Plex Mono",ui-monospace,monospace}
 .tally div{text-align:right}
 .tally b{display:block; font-size:23px; font-weight:600; line-height:1; font-variant-numeric:tabular-nums}
 .tally span{font-family:"Barlow Condensed",sans-serif; font-size:12px; letter-spacing:.1em;
@@ -296,17 +300,17 @@ footer{margin-top:22px; padding-top:12px; border-top:1px solid var(--hair);
 
 <div class="wrap">
   <header class="mast">
-    <div>
+    <div class="lede">
       <h1>Travel Set <em>Rink Map</em></h1>
-      <p>Every game that matches your availability, grouped into seven trips and clustered by
-         how close the rinks sit. A cluster holds rinks within ~300 road miles of <em>each other</em>.
-         <strong>Max games</strong> counts what you could actually skate — one game a day, two on a
-         showcase day — and lists every drivable group of rinks that reaches that number.</p>
+      <p><b>Instructions:</b> Games matched to availability are grouped by date (a travel
+         set). For each travel set, multiple trip options are presented in order of the
+         number of available games. The details of a trip set can be viewed by clicking on
+         the summary. Trip sets are created by clustering rinks that are within ~300 road
+         miles of each other. A cluster is displayed on a map for visual confirmation.</p>
     </div>
     <div class="tally">
-      <div><b id="tGames">0</b><span>games</span></div>
+      <div><b id="tMax">0</b><span>max games</span></div>
       <div><b id="tSets">0</b><span>trips</span></div>
-      <div><b id="tRinks">0</b><span>rinks</span></div>
     </div>
   </header>
 
@@ -371,10 +375,9 @@ let active = new Set(CATS.map(c => c[0]));
 let focus = null;                       // focused cluster id
 
 /* ---------- totals ---------- */
-document.getElementById('tGames').textContent = DATA.sets.reduce((a, s) => a + s.nGames, 0);
-document.getElementById('tSets').textContent = DATA.sets.filter(s => s.nGames > 0).length;
-document.getElementById('tRinks').textContent =
-  new Set(DATA.sets.flatMap(s => s.clusters.flatMap(c => c.arenas.map(a => a.arena)))).size;
+document.getElementById('tMax').textContent =
+  Math.max(...DATA.sets.map(s => s.best.games));
+document.getElementById('tSets').textContent = DATA.sets.length;
 
 /* ---------- static map layer ---------- */
 const NS = 'http://www.w3.org/2000/svg';
