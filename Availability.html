@@ -1,0 +1,305 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Availability Coverage Record</title>
+<meta name="description" content="Availability submitted for September-November 2026 set against the games scheduled on those dates.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:wght@400;700&display=swap">
+<style>
+  :root { color-scheme: light dark; }
+  html, body { margin: 0; }
+  img { max-width: 100%; }
+  [hidden] { display: none !important; }
+  @media print {
+    :root { color-scheme: light; }
+    .page { max-width: none; padding-block: 0 }
+    section { break-inside: avoid-page }
+  }
+</style>
+</head>
+<body>
+
+<style>
+/* Palette validated with the dataviz six-checks script.
+   light  #008066 / #20509E on #F7F4EE   dark  #2FA982 / #5C8FD6 on #14181C */
+:root{
+  --paper:#f7f4ee; --card:#ffffff; --sunk:#efeae1;
+  --ink:#1d262c; --ink-2:#4b5760; --muted:#6f7c85;
+  --rule:#ddd6ca; --rule-2:#e9e3d8;
+  --drive:#008066; --travel:#20509e; --none:#9aa4ab;
+  --drive-wash:#e2f0eb; --travel-wash:#e4eaf5; --none-wash:#eeebe5;
+  --shadow:0 1px 2px rgba(29,38,44,.05), 0 8px 20px rgba(29,38,44,.05);
+}
+@media (prefers-color-scheme:dark){
+  :root:not([data-theme="light"]){
+    --paper:#14181c; --card:#1c2228; --sunk:#11151a;
+    --ink:#eef2f5; --ink-2:#b5c1c9; --muted:#8b98a1;
+    --rule:#2b333a; --rule-2:#232a30;
+    --drive:#2fa982; --travel:#5c8fd6; --none:#5a6873;
+    --drive-wash:#17302a; --travel-wash:#1b2635; --none-wash:#20262b;
+    --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+  }
+}
+:root[data-theme="dark"]{
+  --paper:#14181c; --card:#1c2228; --sunk:#11151a;
+  --ink:#eef2f5; --ink-2:#b5c1c9; --muted:#8b98a1;
+  --rule:#2b333a; --rule-2:#232a30;
+  --drive:#2fa982; --travel:#5c8fd6; --none:#5a6873;
+  --drive-wash:#17302a; --travel-wash:#1b2635; --none-wash:#20262b;
+  --shadow:0 1px 2px rgba(0,0,0,.4), 0 8px 24px rgba(0,0,0,.3);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:"Atkinson Hyperlegible", system-ui, -apple-system, "Segoe UI", sans-serif;
+  font-size:18px; line-height:1.65; letter-spacing:.005em;
+  -webkit-font-smoothing:antialiased;
+}
+.page{max-width:860px; margin:0 auto; padding-inline:20px; padding-block:36px 64px}
+
+h1{font-size:clamp(30px,5vw,40px); line-height:1.15; margin:0 0 10px; text-wrap:balance}
+h2{font-size:clamp(21px,3.4vw,25px); line-height:1.25; margin:0 0 6px}
+p{margin:0 0 14px; max-width:64ch}
+.big{font-size:19px}
+strong{font-weight:700}
+
+header.top{border-bottom:4px solid var(--ink); padding-bottom:20px; margin-bottom:30px}
+header.top .kicker{font-size:15px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); margin:0 0 10px}
+header.top p{color:var(--ink-2); margin-bottom:0}
+
+section{margin-top:40px}
+section > p:last-child{margin-bottom:0}
+.lead{font-size:19px; color:var(--ink-2)}
+
+/* ---------- stat tiles ---------- */
+.tiles{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(min(190px,100%),1fr));
+  margin:22px 0 0; padding:0; list-style:none}
+.tile{background:var(--card); border:1px solid var(--rule); border-radius:6px;
+  padding:16px 18px; box-shadow:var(--shadow)}
+.tile b{display:block; font-size:44px; line-height:1; font-variant-numeric:tabular-nums}
+.tile span{display:block; margin-top:8px; font-size:16px; color:var(--ink-2); line-height:1.4}
+.tile.t-drive{border-left:6px solid var(--drive)} .tile.t-drive b{color:var(--drive)}
+.tile.t-travel{border-left:6px solid var(--travel)} .tile.t-travel b{color:var(--travel)}
+
+/* ---------- legend ---------- */
+.legend{display:flex; flex-wrap:wrap; gap:8px 20px; margin:0 0 16px; padding:0; list-style:none;
+  font-size:16px}
+.legend li{display:flex; align-items:center; gap:8px}
+.key{width:20px; height:20px; border-radius:4px; flex:0 0 auto; display:grid; place-items:center;
+  color:#fff; font-size:13px; font-weight:700; line-height:1}
+.k-drive{background:var(--drive)} .k-travel{background:var(--travel)}
+.k-none{background:var(--none)}
+
+/* ---------- day grid ---------- */
+.foot{font-size:16px; color:var(--ink-2); margin:14px 0 0}
+.days{display:grid; gap:8px; grid-template-columns:repeat(auto-fill,minmax(min(152px,100%),1fr));
+  margin:0; padding:0; list-style:none}
+.day{border:1px solid var(--rule); border-radius:6px; padding:10px 12px 11px; background:var(--card)}
+.day .dt{font-weight:700; font-size:18px; line-height:1.2}
+.day .wd{font-size:15px; color:var(--muted); margin-bottom:7px}
+.day .st{display:flex; align-items:center; gap:7px; font-size:15px; line-height:1.3}
+.day .st .key{width:17px; height:17px; font-size:11px}
+.day.drive{background:var(--drive-wash); border-color:var(--drive)}
+.day.travel{background:var(--travel-wash); border-color:var(--travel)}
+.day.none{background:var(--none-wash)}
+.day.none .st{color:var(--ink-2)}
+
+/* ---------- month bars ---------- */
+.months{margin:0; padding:0; list-style:none; display:grid; gap:18px}
+.month .mh{display:flex; align-items:baseline; gap:10px; margin-bottom:7px}
+.month .mh b{font-size:19px}
+.month .mh span{font-size:16px; color:var(--ink-2)}
+.bar{display:flex; gap:2px; height:38px; border-radius:5px; overflow:hidden}
+.seg{display:grid; place-items:center; color:#fff; font-weight:700; font-size:16px;
+  min-width:2px; font-variant-numeric:tabular-nums}
+.seg.s-drive{background:var(--drive)} .seg.s-travel{background:var(--travel)}
+.seg.s-none{background:var(--none)}
+.axis{display:flex; justify-content:space-between; font-size:14px; color:var(--muted);
+  margin-top:6px}
+
+/* ---------- table ---------- */
+.tw{overflow-x:auto; border:1px solid var(--rule); border-radius:6px; background:var(--card)}
+table{border-collapse:collapse; width:100%; font-size:17px}
+caption{text-align:left; font-size:16px; color:var(--ink-2); padding:0 0 10px}
+th,td{text-align:left; padding:11px 14px; border-bottom:1px solid var(--rule-2); vertical-align:top}
+th{font-weight:700; font-size:15px; letter-spacing:.06em; text-transform:uppercase;
+  color:var(--ink-2); background:var(--sunk); white-space:nowrap}
+tbody tr:last-child td{border-bottom:0}
+td.n{font-variant-numeric:tabular-nums; white-space:nowrap; font-weight:700}
+td.teams{color:var(--ink-2)}
+
+/* ---------- callout + notes ---------- */
+.note{background:var(--card); border:1px solid var(--rule); border-left:6px solid var(--drive);
+  border-radius:6px; padding:18px 20px; box-shadow:var(--shadow)}
+.note p:last-child{margin-bottom:0}
+.method{font-size:16px; color:var(--ink-2); border-top:1px solid var(--rule);
+  padding-top:18px; margin-top:44px}
+.method p{max-width:70ch}
+.method h2{font-size:17px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted);
+  margin-bottom:8px}
+ul.plain{margin:0 0 14px; padding-left:22px}
+ul.plain li{margin-bottom:7px; max-width:64ch}
+
+@media (max-width:560px){
+  body{font-size:17px}
+  .page{padding-inline:16px; padding-block:26px 48px}
+  .tile b{font-size:38px}
+  .bar{height:34px}
+}
+@media (prefers-reduced-motion:reduce){*{transition:none !important}}
+</style>
+
+<div class="page">
+
+<header class="top">
+  <p class="kicker">Officiating availability record</p>
+  <h1>Availability Coverage Record</h1>
+  <p class="big">Availability submitted for <strong>September, October and November 2026</strong>,
+     set against the NAHL and USHL games scheduled on those same dates.</p>
+</header>
+
+<section>
+  <h2>The short version</h2>
+  <p class="lead">Twenty-five days were submitted as available. Games were on the schedule
+     on <strong>fourteen</strong> of them. On <strong>ten</strong> of those days a game was
+     within driving distance, with no flight required.</p>
+  <ul class="tiles">
+    <li class="tile"><b>25</b><span>days submitted as available</span></li>
+    <li class="tile t-drive"><b>14</b><span>of those days had at least one game scheduled</span></li>
+    <li class="tile t-drive"><b>10</b><span>days had a game within driving distance</span></li>
+    <li class="tile t-travel"><b id="tGames">0</b><span>games on the schedule across those days</span></li>
+  </ul>
+</section>
+
+<section>
+  <h2>Every day submitted</h2>
+  <p>Each box below is one day that was offered. The colour and the words say what was on
+     the schedule that day.</p>
+  <ul class="legend">
+    <li><span class="key k-drive" aria-hidden="true">&#10003;</span> Game within driving distance</li>
+    <li><span class="key k-travel" aria-hidden="true">&#9992;</span> Game scheduled, travel required</li>
+    <li><span class="key k-none" aria-hidden="true">&ndash;</span> No game scheduled</li>
+  </ul>
+  <ul class="days" id="days"></ul>
+  <p class="foot">On a green day the number counts the games within driving distance.
+     Some of those days had further games that would have needed travel.</p>
+</section>
+
+<section>
+  <h2>Month by month</h2>
+  <p>The same twenty-five days, grouped by month. Each bar is one day wide per day offered.</p>
+  <ul class="months" id="months"></ul>
+</section>
+
+<section>
+  <h2>Days with a game inside driving distance</h2>
+  <p>On these ten days a game was scheduled at a rink reachable by car from the
+     starting location given for that date. No flight was needed.</p>
+  <div class="tw">
+    <table>
+      <caption>Home teams playing within driving distance, by date.</caption>
+      <thead>
+        <tr><th scope="col">Date</th><th scope="col">Start from</th>
+            <th scope="col">Games</th><th scope="col">Home teams</th></tr>
+      </thead>
+      <tbody id="driveRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<section>
+  <h2>What the schedule allowed</h2>
+  <div class="note">
+    <p>The twenty-five days form <strong>seven trips</strong> — runs of days that sit next
+       to each other on the calendar. Every one of the seven had games available.</p>
+    <p>Counting <strong>one game per day</strong>, and two on a day that offered two or more
+       showcase games, the schedule allowed up to <strong id="tMax">0</strong> games to be
+       worked across the three months.</p>
+  </div>
+  <div class="tw" style="margin-top:16px">
+    <table>
+      <caption>Each trip, the games on the schedule, and the most that could be worked.</caption>
+      <thead>
+        <tr><th scope="col">Trip</th><th scope="col">Dates</th><th scope="col">Start from</th>
+            <th scope="col">Games scheduled</th><th scope="col">Most workable</th></tr>
+      </thead>
+      <tbody id="tripRows"></tbody>
+    </table>
+  </div>
+</section>
+
+<div class="method">
+  <h2>How these figures were produced</h2>
+  <p>Availability dates, starting locations and travel notes are taken from the submitted
+     availability sheet. Game dates, teams and venues are taken from the published NAHL and
+     USHL schedules for the same period.</p>
+  <ul class="plain">
+    <li>A game counts for a date only if that date was submitted as available.</li>
+    <li>"Within driving distance" means the home rink is one of the teams listed as local to
+       the starting location recorded for that date.</li>
+    <li>"Most workable" applies one game per day, and two on a day offering two or more
+       showcase games.</li>
+    <li>Every figure on this page can be traced to a single row in the accompanying workbook.</li>
+  </ul>
+  <p>This page is a record of what was on the schedule. It does not describe how assignments
+     were made.</p>
+</div>
+
+</div>
+
+<script>
+const D = {"days":[{"iso":"2026-09-04","d":"Sep 4","wd":"Fri","month":"September","start":"DC","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-09-05","d":"Sep 5","wd":"Sat","month":"September","start":"DC","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-09-06","d":"Sep 6","wd":"Sun","month":"September","start":"DC","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-09-11","d":"Sep 11","wd":"Fri","month":"September","start":"DC","scope":"Anywhere","total":3,"drive":2,"teams":["New Jersey Titans","Philadelphia Rebels"],"status":"drive"},{"iso":"2026-09-12","d":"Sep 12","wd":"Sat","month":"September","start":"DC","scope":"Anywhere","total":4,"drive":2,"teams":["Maryland Black Bears","New Jersey Titans"],"status":"drive"},{"iso":"2026-09-13","d":"Sep 13","wd":"Sun","month":"September","start":"DC","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-09-16","d":"Sep 16","wd":"Wed","month":"September","start":"DC","scope":"Local NAHL","total":1,"drive":1,"teams":["New Jersey Titans"],"status":"drive"},{"iso":"2026-09-23","d":"Sep 23","wd":"Wed","month":"September","start":"DC","scope":"Anywhere","total":14,"drive":0,"teams":[],"status":"travel"},{"iso":"2026-09-26","d":"Sep 26","wd":"Sat","month":"September","start":"DC","scope":"Anywhere","total":20,"drive":0,"teams":[],"status":"travel"},{"iso":"2026-09-27","d":"Sep 27","wd":"Sun","month":"September","start":"DC","scope":"Anywhere","total":1,"drive":0,"teams":[],"status":"travel"},{"iso":"2026-10-09","d":"Oct 9","wd":"Fri","month":"October","start":"Chicago","scope":"Anywhere","total":21,"drive":5,"teams":["Cedar Rapids","Chicago","Dubuque","Janesville Jets","USA Hockey NTDP"],"status":"drive"},{"iso":"2026-10-10","d":"Oct 10","wd":"Sat","month":"October","start":"Chicago","scope":"Anywhere","total":24,"drive":5,"teams":["Cedar Rapids","Chicago","Dubuque","Janesville Jets","USA Hockey NTDP"],"status":"drive"},{"iso":"2026-10-11","d":"Oct 11","wd":"Sun","month":"October","start":"Chicago","scope":"Anywhere","total":4,"drive":0,"teams":[],"status":"travel"},{"iso":"2026-10-18","d":"Oct 18","wd":"Sun","month":"October","start":"DC","scope":"Local NAHL","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-10-23","d":"Oct 23","wd":"Fri","month":"October","start":"DC","scope":"Maryland NAHL","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-10-25","d":"Oct 25","wd":"Sun","month":"October","start":"DC","scope":"Local NAHL","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-10-31","d":"Oct 31","wd":"Sat","month":"October","start":"Chicago","scope":"Midwest NAHL or USHL","total":7,"drive":2,"teams":["Green Bay","Janesville Jets"],"status":"drive"},{"iso":"2026-11-01","d":"Nov 1","wd":"Sun","month":"November","start":"Chicago","scope":"Midwest NAHL or USHL","total":2,"drive":1,"teams":["Dubuque"],"status":"drive"},{"iso":"2026-11-22","d":"Nov 22","wd":"Sun","month":"November","start":"Chicago","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-11-23","d":"Nov 23","wd":"Mon","month":"November","start":"Chicago","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-11-24","d":"Nov 24","wd":"Tue","month":"November","start":"Chicago","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"},{"iso":"2026-11-25","d":"Nov 25","wd":"Wed","month":"November","start":"Chicago","scope":"Anywhere","total":13,"drive":3,"teams":["Chicago","USA Hockey NTDP"],"status":"drive"},{"iso":"2026-11-27","d":"Nov 27","wd":"Fri","month":"November","start":"Chicago","scope":"Anywhere","total":19,"drive":4,"teams":["Dubuque","Green Bay","Muskegon","USA Hockey NTDP"],"status":"drive"},{"iso":"2026-11-28","d":"Nov 28","wd":"Sat","month":"November","start":"Chicago","scope":"Anywhere","total":23,"drive":5,"teams":["Cedar Rapids","Dubuque","Green Bay","Muskegon","USA Hockey NTDP"],"status":"drive"},{"iso":"2026-11-29","d":"Nov 29","wd":"Sun","month":"November","start":"Chicago","scope":"Anywhere","total":0,"drive":0,"teams":[],"status":"none"}],"months":[{"month":"September","days":10,"withg":6,"drive":3,"games":43},{"month":"October","days":7,"withg":4,"drive":3,"games":56},{"month":"November","days":8,"withg":4,"drive":4,"games":57}],"trips":[{"n":1,"span":"Sep 11 \u2013 Sep 13","base":"DC","games":7,"mx":2,"ndays":3},{"n":2,"span":"Sep 16","base":"DC","games":1,"mx":1,"ndays":1},{"n":3,"span":"Sep 23","base":"DC","games":14,"mx":2,"ndays":1},{"n":4,"span":"Sep 26 \u2013 Sep 27","base":"DC","games":21,"mx":3,"ndays":2},{"n":5,"span":"Oct 9 \u2013 Oct 11","base":"Chicago","games":49,"mx":3,"ndays":3},{"n":6,"span":"Oct 31 \u2013 Nov 1","base":"Chicago","games":9,"mx":2,"ndays":2},{"n":7,"span":"Nov 22 \u2013 Nov 29","base":"Chicago","games":55,"mx":3,"ndays":7}],"tot":{"days":25,"withg":14,"drive":10,"games":156,"driveGames":30,"trips":7,"maxTotal":16}};
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+const KEY = { drive: ['k-drive', '✓'], travel: ['k-travel', '✈'], none: ['k-none', '–'] };
+const WORD = {
+  drive: n => `${n} game${n === 1 ? '' : 's'} — no flight needed`,
+  travel: n => `${n} game${n === 1 ? '' : 's'} — travel needed`,
+  none:  () => 'No game scheduled'
+};
+
+document.getElementById('tGames').textContent = D.tot.games;
+document.getElementById('tMax').textContent = D.tot.maxTotal;
+
+document.getElementById('days').innerHTML = D.days.map(d => {
+  const [k, mark] = KEY[d.status];
+  const n = d.status === 'drive' ? d.drive : d.total;
+  return `<li class="day ${d.status}">
+    <div class="dt">${esc(d.d)}</div>
+    <div class="wd">${esc(d.wd)}</div>
+    <div class="st"><span class="key ${k}" aria-hidden="true">${mark}</span>
+      <span>${esc(WORD[d.status](n))}</span></div>
+  </li>`;
+}).join('');
+
+document.getElementById('months').innerHTML = D.months.map(m => {
+  const drive = m.drive, travel = m.withg - m.drive, none = m.days - m.withg;
+  const seg = (cls, v, label) => v ? `<div class="seg s-${cls}" style="flex:${v}"
+      title="${v} ${label}">${v}</div>` : '';
+  return `<li class="month">
+    <div class="mh"><b>${esc(m.month)}</b><span>${m.days} days submitted</span></div>
+    <div class="bar">
+      ${seg('drive', drive, 'days with a drivable game')}
+      ${seg('travel', travel, 'days with a game, travel required')}
+      ${seg('none', none, 'days with no game scheduled')}
+    </div>
+    <div class="axis"><span>0 days</span><span>${m.days} days</span></div>
+  </li>`;
+}).join('');
+
+document.getElementById('driveRows').innerHTML = D.days.filter(d => d.drive).map(d => `
+  <tr><td class="n">${esc(d.d)}</td><td>${esc(d.start)}</td>
+      <td class="n">${d.drive}</td>
+      <td class="teams">${esc(d.teams.join(', '))}</td></tr>`).join('');
+
+document.getElementById('tripRows').innerHTML = D.trips.map(t => `
+  <tr><td class="n">${t.n}</td><td>${esc(t.span)}</td><td>${esc(t.base)}</td>
+      <td class="n">${t.games}</td><td class="n">${t.mx}</td></tr>`).join('');
+</script>
+
+</body>
+</html>
