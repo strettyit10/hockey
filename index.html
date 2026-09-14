@@ -118,7 +118,9 @@ body{
 .phead{padding:14px 16px; border-bottom:1px solid var(--hair-2); display:flex;
   flex-wrap:wrap; gap:12px 22px; align-items:baseline}
 .phead h2{font-family:"Barlow Condensed",sans-serif; font-weight:700; text-transform:uppercase;
-  font-size:26px; margin:0; line-height:1; letter-spacing:.01em}
+  font-size:26px; margin:0; line-height:1.1; letter-spacing:.01em}
+.phead h2 .setno{color:var(--blueline)}
+.phead h2 .maxno{color:var(--teal)}
 .facts{display:flex; flex-wrap:wrap; gap:6px 8px; margin-left:auto}
 .fact{font-family:"IBM Plex Mono",monospace; font-size:11.5px; border:1px solid var(--hair);
   border-radius:2px; padding:2px 7px; color:var(--ink-2); background:var(--surface-2)}
@@ -134,11 +136,11 @@ body{
 .haul{padding:12px 16px; border-bottom:1px solid var(--hair-2); background:var(--surface-2)}
 .haul .hd{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 12px}
 .haul .cap{font-family:"Barlow Condensed",sans-serif; font-weight:700; text-transform:uppercase;
-  letter-spacing:.09em; font-size:12px; color:var(--redline)}
+  letter-spacing:.06em; font-size:14px; color:var(--redline); line-height:1.25}
 .haul .btn{margin-left:auto; font:inherit; font-size:12.5px; cursor:pointer; padding:3px 10px;
   border-radius:2px; border:1px solid var(--redline); background:transparent; color:var(--redline)}
 .haul .btn[aria-pressed="true"]{background:var(--redline); color:var(--surface)}
-.haul .tie{font-size:13.5px; color:var(--ink-2); margin-top:8px}
+.haul .tie{font-size:13.5px; color:var(--ink-2); margin-top:7px}
 .filters2{display:flex; flex-wrap:wrap; gap:6px 22px; margin:10px 0 0}
 .frow{display:flex; flex-wrap:wrap; align-items:center; gap:5px}
 .flab{font-family:"Barlow Condensed",sans-serif; font-weight:700; font-size:11.5px;
@@ -218,6 +220,7 @@ svg.map{display:block; width:100%; height:auto; max-width:100%;
 /* ---------- clusters ---------- */
 .dethead{display:flex; flex-wrap:wrap; align-items:baseline; gap:8px 14px;
   padding:14px 16px 0}
+.dethead .filters2{flex:1 0 100%; margin:2px 0 0}
 .dethead h3{font-family:"Barlow Condensed",sans-serif; font-weight:700; text-transform:uppercase;
   font-size:19px; letter-spacing:.03em; margin:0; line-height:1}
 .dethead .sub{font-size:12.5px; color:var(--muted)}
@@ -276,8 +279,6 @@ svg.map{display:block; width:100%; height:auto; max-width:100%;
 .empty-note b{display:block; font-family:"Barlow Condensed",sans-serif; font-size:20px;
   text-transform:uppercase; color:var(--ink-2); margin-bottom:3px}
 
-footer{margin-top:22px; padding-top:12px; border-top:1px solid var(--hair);
-  color:var(--muted); font-size:12.5px; display:flex; flex-wrap:wrap; gap:4px 20px}
 @media (max-width:640px){
   .wrap{padding-inline:12px; padding-block:16px 40px}
   .mast{gap:8px 16px; padding-bottom:10px; margin-bottom:14px}
@@ -353,16 +354,12 @@ footer{margin-top:22px; padding-top:12px; border-top:1px solid var(--hair);
           <button type="button" id="expandAll">Expand all</button>
           <button type="button" id="collapseAll">Collapse all</button>
         </span>
+        <div class="filters2" id="detFilters"></div>
       </div>
       <div class="clusters" id="clusters"></div>
     </main>
   </div>
 
-  <footer>
-    <span>Distances are straight-line &times; 1.2, at 60 mph — triage, not routing.</span>
-    <span>USHL faceoff times are not published in the source schedule.</span>
-    <span>Alaska shown inset at 35% scale.</span>
-  </footer>
 </div>
 
 <script>
@@ -383,14 +380,15 @@ const SHORT = {
 const cvar = i => `var(${CC[i % CC.length]})`;
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
-let setIdx = DATA.sets.reduce((b, s, i) => s.nGames > DATA.sets[b].nGames ? i : b, 0);
+let setIdx = 0;          // open on the first travel set
 let bestOnly = false;
 let optIdx = null;
 let fLeague = 'All';     // All | NAHL | USHL | Both
 let fTravel = 'All';     // All | Drive | Fly | TBD
-let openCl = null;      // Set of expanded cluster ids; null = not yet initialised
+let dLeague = 'All';     // Additional Details filters
+let dTravel = 'All';
+let openCl = null;      // expanded clusters = highlighted clusters; null = not yet initialised
 let active = new Set(CATS.map(c => c[0]));
-let focus = null;                       // focused cluster id
 
 /* ---------- totals ---------- */
 document.getElementById('tMax').textContent =
@@ -422,8 +420,9 @@ DATA.sets.forEach((s, i) => {
     `<span class="sub"><span class="basepip">${esc(s.start)}</span>` +
     `<span>${s.nGames} games</span><span>max ${s.best.games}</span>` +
     `</span></span>`;
-  b.addEventListener('click', () => { setIdx = i; focus = null; optIdx = null; bestOnly = false;
-    openCl = null; fLeague = 'All'; fTravel = 'All'; render(); });
+  b.addEventListener('click', () => { setIdx = i; optIdx = null; bestOnly = false;
+    openCl = null; fLeague = 'All'; fTravel = 'All';
+    dLeague = 'All'; dTravel = 'All'; render(); });
   rail.appendChild(b);
 });
 
@@ -438,7 +437,7 @@ CATS.forEach(([name, cls]) => {
     if (b.disabled) return;
     active.has(name) ? active.delete(name) : active.add(name);
     if (!active.size) active = new Set(CATS.map(c => c[0]));
-    focus = null; render();
+    render();
   });
   filters.appendChild(b);
 });
@@ -449,8 +448,24 @@ function visibleClusters(s) {
     const arenas = c.arenas
       .map(a => ({ ...a, games: a.games.filter(g => active.has(g.cat)) }))
       .filter(a => a.games.length);
-    return { ...c, arenas, nGames: arenas.reduce((n, a) => n + a.games.length, 0) };
-  }).filter(c => c.arenas.length);
+    if (!arenas.length) return null;
+    const lgs = new Set(arenas.flatMap(a => a.games.map(g => g.lg)));
+    const hrs = Math.min(...arenas.map(a => a.hr));
+    return {
+      ...c, arenas,
+      nGames: arenas.reduce((n, a) => n + a.games.length, 0),
+      maxGames: skateable(arenas),
+      league: lgs.size > 1 ? 'Both' : [...lgs][0],
+      call: hrs <= 5 ? 'Drive'
+          : (lgs.size === 1 && lgs.has('NAHL') ? (hrs <= 8 ? 'TBD' : 'Fly') : 'Fly'),
+    };
+  }).filter(Boolean)
+    .sort((a, b) => b.maxGames - a.maxGames || a.minMi - b.minMi);
+}
+
+function clPasses(c) {
+  return (dLeague === 'All' || c.league === dLeague)
+      && (dTravel === 'All' || c.call === dTravel);
 }
 
 function render() {
@@ -458,9 +473,10 @@ function render() {
   [...rail.querySelectorAll('.setbtn')].forEach((b, i) =>
     b.setAttribute('aria-pressed', String(i === setIdx)));
 
-  document.getElementById('hTitle').textContent =
-    `Set ${s.n} · ` + (s.ndays === 1 ? s.d0full : `${s.d0full} – ${s.d1full}`) +
-    ` · Max games ${s.best.games}`;
+  document.getElementById('hTitle').innerHTML =
+    `<span class="setno">Set ${s.n}</span> · ` +
+    esc(s.ndays === 1 ? s.d0full : `${s.d0full} – ${s.d1full}`) +
+    ` · <span class="maxno">Max games ${s.best.games}</span>`;
 
   document.getElementById('hFacts').innerHTML = [
     `base <b>${esc(s.start)}</b>`,
@@ -477,15 +493,21 @@ function render() {
 
   const b = s.best;
   const haul = document.getElementById('haul');
-  if (b.code === 3 || b.allTie) {
-    haul.innerHTML = b.code === 3 ? '' :
-      `<div class="tie">All ${b.nCliques} drivable clusters in this trip produce ` +
-      `<strong>${b.games}</strong> game${b.games === 1 ? '' : 's'}.</div>`;
-    haul.hidden = b.code === 3;
-  } else {
-    haul.hidden = false;
+  haul.hidden = false;
+  const TITLE = 'Recommended Options to Maximize Trip Game Count';
+  if (b.allTie) {
+    // every drivable cluster yields the same count, so there is nothing to choose between
+    const one = b.nCliques === 1;
     haul.innerHTML =
-      `<div class="hd"><span class="cap">Available locations</span>` +
+      `<div class="hd"><span class="cap">${TITLE}</span></div>` +
+      `<div class="tie">` +
+      (one ? `The only drivable cluster in this trip produces `
+           : `All ${b.nCliques} drivable clusters in this trip produce `) +
+      `<strong>${b.games}</strong> game${b.games === 1 ? '' : 's'}. ` +
+      `See the map and Additional Details below it for cluster options.</div>`;
+  } else {
+    haul.innerHTML =
+      `<div class="hd"><span class="cap">${TITLE}</span>` +
       `<button type="button" class="btn" id="haulBtn" aria-pressed="${bestOnly}">` +
       `${bestOnly ? 'Show all rinks' : 'Isolate on map'}</button></div>` +
       (b.options.length > 3 ? filterBar(b) : '') +
@@ -503,16 +525,23 @@ function render() {
             ).join('<span class="arw">\u2192</span>')}</div>
         </li>` : '').join('') + `</ol>`;
     const hb = document.getElementById('haulBtn');
-    hb && hb.addEventListener('click', () => { bestOnly = !bestOnly; focus = null; render(); });
+    hb && hb.addEventListener('click', () => { bestOnly = !bestOnly; render(); });
     haul.querySelectorAll('.fchip').forEach(el => el.addEventListener('click', () => {
       if (el.disabled) return;
       if (el.dataset.f === 'league') fLeague = el.dataset.v; else fTravel = el.dataset.v;
-      optIdx = null; focus = null; render();
+      optIdx = null; render();
     }));
     haul.querySelectorAll('.opt').forEach(el => el.addEventListener('click', () => {
       const i = Number(el.dataset.opt);
       optIdx = optIdx === i ? null : i;
-      focus = null; render();
+      openCl = openCl || new Set();
+      openCl.clear();
+      if (optIdx !== null) clustersFor(s, b.options[i].keys).forEach(id => openCl.add(id));
+      render();
+      if (optIdx !== null) {
+        const first = document.querySelector('.cl.on');
+        first && first.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     }));
   }
 
@@ -564,6 +593,13 @@ function pickView(pts, allUSHL) {
 const NARROW = window.matchMedia('(max-width: 640px)');
 NARROW.addEventListener('change', () => render());
 
+/* Which clusters of this trip hold the rinks named by a recommended option. */
+function clustersFor(s, keys) {
+  const want = new Set(keys), ids = new Set();
+  s.clusters.forEach(c => c.arenas.forEach(a => { if (want.has(a.arena)) ids.add(c.id); }));
+  return ids;
+}
+
 function optPasses(o) {
   return (fLeague === 'All' || o.league === fLeague)
       && (fTravel === 'All' || o.calls.includes(fTravel));
@@ -603,7 +639,7 @@ function drawMap(s, cls) {
     const d = use.length === 1
       ? `M${use[0][0]} ${use[0][1]}l.01 0`
       : 'M' + use.map(p => `${p[0]} ${p[1]}`).join('L') + (use.length > 2 ? 'Z' : '');
-    return `<path class="blob${focus === c.id ? ' on' : ''}" data-cl="${c.id}" d="${d}"
+    return `<path class="blob${openCl && openCl.has(c.id) ? ' on' : ''}" data-cl="${c.id}" d="${d}"
       fill="${col}" stroke="${col}" stroke-width="${(26 * k0).toFixed(1)}"></path>`;
   }).join('');
 
@@ -620,7 +656,7 @@ function drawMap(s, cls) {
       const r = (4.2 + Math.min(a.games.length, 5) * 1.25) * k0;
       const inBest = best.has(a.arena);
       if (bestOnly && !inBest) return;
-      const on = focus === c.id;
+      const on = !!(openCl && openCl.has(c.id));
       if (inBest) dots.push(`<circle class="ring dot${on ? ' on' : ''}" data-cl="${c.id}"
         cx="${a.x}" cy="${a.y}" r="${(r + 4.5 * k0).toFixed(1)}"></circle>`);
       dots.push(`<circle class="dot${on ? ' on' : ''}" data-cl="${c.id}" cx="${a.x}" cy="${a.y}"
@@ -634,7 +670,7 @@ function drawMap(s, cls) {
   });
   gDots.innerHTML = dots.join('');
   gLbls.innerHTML = lbls.join('');
-  map.classList.toggle('dim', focus !== null);
+  map.classList.toggle('dim', !!(openCl && openCl.size));
 
   const allUSHL = cls.every(c => c.arenas.every(a => a.games.every(g => g.lg === 'USHL')));
   const pts = cls.flatMap(c => c.arenas.map(a => [a.x, a.y]));
@@ -646,11 +682,12 @@ function drawMap(s, cls) {
   map.querySelectorAll('[data-cl]').forEach(el => {
     el.addEventListener('click', () => {
       const id = Number(el.dataset.cl);
-      focus = focus === id ? null : id;
-      if (openCl) { focus === null ? openCl.delete(id) : openCl.add(id); }
+      openCl = openCl || new Set();
+      const opening = !openCl.has(id);
+      opening ? openCl.add(id) : openCl.delete(id);
       redraw();
-      if (focus !== null) {
-        const card = document.querySelector(`.cl[data-cl="${focus}"]`);
+      if (opening) {
+        const card = document.querySelector(`.cl[data-cl="${id}"]`);
         card && card.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
       }
     });
@@ -669,16 +706,40 @@ function drawClusters(s, cls) {
   }
   if (openCl === null) openCl = new Set();             // everything closed at rest
   dh.hidden = false;
-  document.getElementById('detSub').textContent =
-    `${cls.length} cluster${cls.length === 1 ? '' : 's'} · every game in this trip`;
+  const shown = cls.filter(clPasses);
+  document.getElementById('detSub').textContent = shown.length === cls.length
+    ? `${cls.length} cluster${cls.length === 1 ? '' : 's'} · highest game count first`
+    : `${shown.length} of ${cls.length} clusters · highest game count first`;
 
-  host.innerHTML = cls.map((c, i) => {
+  const dcount = (t) => cls.filter(t).length;
+  const drow = (label, name, vals, cur) =>
+    `<div class="frow"><span class="flab">${label}</span>` + vals.map(([v, lbl, n]) =>
+      `<button type="button" class="fchip" data-df="${name}" data-v="${v}"
+        aria-pressed="${cur === v}"${n === 0 ? ' disabled' : ''}>${lbl}` +
+      (v === 'All' ? '' : ` <span class="n">${n}</span>`) + `</button>`).join('') + `</div>`;
+  const travelVals = [['All', 'All', cls.length],
+                      ['Drive', 'Local (Drive)', dcount(c => c.call === 'Drive')],
+                      ['Fly', 'Fly', dcount(c => c.call === 'Fly')]];
+  if (dcount(c => c.call === 'TBD')) travelVals.push(['TBD', 'TBD', dcount(c => c.call === 'TBD')]);
+  document.getElementById('detFilters').innerHTML =
+    drow('League', 'league', [['All', 'All', cls.length],
+      ['NAHL', 'NAHL', dcount(c => c.league === 'NAHL')],
+      ['USHL', 'USHL', dcount(c => c.league === 'USHL')],
+      ['Both', 'Both', dcount(c => c.league === 'Both')]], dLeague) +
+    drow('Travel', 'travel', travelVals, dTravel);
+  dh.querySelectorAll('.fchip').forEach(el => el.addEventListener('click', () => {
+    if (el.disabled) return;
+    if (el.dataset.df === 'league') dLeague = el.dataset.v; else dTravel = el.dataset.v;
+    redraw();
+  }));
+
+  host.innerHTML = cls.map((c, i) => clPasses(c) ? (() => {
     const col = cvar(i);
     const nearest = c.arenas[0];
     const title = c.arenas.length === 1
       ? `${nearest.city}, ${nearest.state}`
       : `${nearest.city} + ${c.arenas.length - 1} more`;
-    const mx = skateable(c.arenas);
+    const mx = c.maxGames;
     const meta =
       `${c.nGames} total available game${c.nGames === 1 ? '' : 's'}<br>` +
       `<b>${mx} Max # of Games</b><br>` +
@@ -699,7 +760,7 @@ function drawClusters(s, cls) {
             <span class="t">${esc(g.time)}</span>
           </div>`).join('')}
       </div>`).join('');
-    return `<details class="cl${focus === c.id ? ' on' : ''}" data-cl="${c.id}"
+    return `<details class="cl${openCl.has(c.id) ? ' on' : ''}" data-cl="${c.id}"
       style="color:${col}"${openCl.has(c.id) ? ' open' : ''}>
       <summary class="clhead">
         <span class="clbadge" style="background:${col}">${c.id}</span>
@@ -709,7 +770,7 @@ function drawClusters(s, cls) {
         <span class="ttl">${esc(title)}</span>
         <span class="meta">${meta}</span>
       </summary>${body}</details>`;
-  }).join('');
+  })() : '').join('');
 
   host.querySelectorAll('.cl').forEach(el => {
     el.addEventListener('toggle', () => {
@@ -717,21 +778,17 @@ function drawClusters(s, cls) {
       // A freshly written <details open> can emit a toggle it never asked for;
       // only act when the element disagrees with the state we rendered.
       if (el.open === openCl.has(id)) return;
-      if (el.open) { openCl.add(id); focus = id; }
-      else {
-        openCl.delete(id);
-        if (focus === id) focus = null;
-      }
+      el.open ? openCl.add(id) : openCl.delete(id);
       redraw();
     });
   });
 
-  const ids = cls.map(c => c.id);
+  const ids = cls.filter(clPasses).map(c => c.id);
   document.getElementById('expandAll').onclick = () => {
     ids.forEach(i => openCl.add(i)); redraw();
   };
   document.getElementById('collapseAll').onclick = () => {
-    openCl.clear(); focus = null; redraw();
+    openCl.clear(); optIdx = null; redraw();
   };
 }
 
